@@ -94,40 +94,51 @@ coordinates = peak_local_max(np.log(D), min_distance=10, threshold_rel=0.05, ind
 
 plt.figure(figsize=(10, 5))
 plt.imshow(coordinates, cmap=plt.get_cmap('gray_r'), origin='lower')
+
+x, y = np.nonzero(coordinates)
+
+# Need to swap x and y for some reason...
+plt.scatter(y, x, s=1.5)
+
 plt.show()
 
 # Method using ndimage.maximum_filter()
-coordinates = peak_picking_max_filter(D, min_distance=10, threshold_rel=0.05)
+# coordinates = peak_picking_max_filter(D, min_distance=10, threshold_rel=0.05)
+#
+# plt.figure(figsize=(10, 5))
+# plt.imshow(coordinates, cmap=plt.get_cmap('gray_r'), origin='lower')
+# plt.show()
+#
+# # Implementation of technique described in Fundamentals of Music Processing
+# coordinates = peak_picking_fpm(D, min_distance=10, threshold_rel=0.05)
+#
+# plt.figure(figsize=(10, 5))
+# plt.imshow(coordinates, cmap=plt.get_cmap('gray_r'), origin='lower')
+# plt.show()
+#
+# # Experiment with different time-frequency representations beyond the STFT,
+# # e.g. you can use the CQT spectrogram or mel spectrogram as alternatives.
+#
+# # Mel spectrogram and technique described in Fundamentals of Music Processing.
+# S = librosa.feature.melspectrogram(snd, sr=sr, n_fft=1024, window='hann', win_length=1024, hop_length=512)
+# coordinates = peak_picking_fpm(S, min_distance=10, threshold_rel=0.05)
+#
+# plt.figure(figsize=(10, 5))
+# plt.imshow(coordinates, cmap=plt.get_cmap('gray_r'), origin='lower')
+# plt.show()
+#
+# # CQT and technique described in Fundamentals of Music Processing.
+# C = np.abs(librosa.cqt(snd, sr=sr, window='hann', hop_length=512))
+# coordinates = peak_picking_fpm(C, min_distance=10, threshold_rel=0.05)
+#
+# plt.figure(figsize=(10, 5))
+# plt.imshow(coordinates, cmap=plt.get_cmap('gray_r'), origin='lower')
+# plt.show()
 
-plt.figure(figsize=(10, 5))
-plt.imshow(coordinates, cmap=plt.get_cmap('gray_r'), origin='lower')
-plt.show()
+# Explore different parameters for defining your peak picking neighbourhood.
 
-# Implementation of technique described in Fundamentals of Music Processing
-coordinates = peak_picking_fpm(D, min_distance=10, threshold_rel=0.05)
-
-plt.figure(figsize=(10, 5))
-plt.imshow(coordinates, cmap=plt.get_cmap('gray_r'), origin='lower')
-plt.show()
-
-# Experiment with different time-frequency representations beyond the STFT,
-# e.g. you can use the CQT spectrogram or mel spectrogram as alternatives.
-
-# Mel spectrogram and technique described in Fundamentals of Music Processing.
-S = librosa.feature.melspectrogram(snd, sr=sr, n_fft=1024, window='hann', win_length=1024, hop_length=512)
-coordinates = peak_picking_fpm(S, min_distance=10, threshold_rel=0.05)
-
-plt.figure(figsize=(10, 5))
-plt.imshow(coordinates, cmap=plt.get_cmap('gray_r'), origin='lower')
-plt.show()
-
-# CQT and technique described in Fundamentals of Music Processing.
-C = np.abs(librosa.cqt(snd, sr=sr, window='hann', hop_length=512))
-coordinates = peak_picking_fpm(C, min_distance=10, threshold_rel=0.05)
-
-plt.figure(figsize=(10, 5))
-plt.imshow(coordinates, cmap=plt.get_cmap('gray_r'), origin='lower')
-plt.show()
+# What could these be?  I guess a neighborhood doesn't necessarily have to
+# be perfectly square...
 
 
 
