@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/audioIdentification.iml" filepath="$PROJECT_DIR$/.idea/audioIdentification.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../beatTracker/.idea/beatTracker.iml" filepath="$PROJECT_DIR$/../beatTracker/.idea/beatTracker.iml" />
+    </modules>
+  </component>
+</project>
