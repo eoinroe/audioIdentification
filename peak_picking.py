@@ -22,6 +22,9 @@ def peak_picking(matrix, size):
         # Find the maximum value in the neighborhood
         maximum = np.amax(m)
 
+        # Assigning nan to any value lower than the minimum intensity
+        # m[m < min_intensity] = math.nan
+
         # Assign truth values to all the values in the neighborhood
         grid[row + x, col + y] = m == maximum
 
