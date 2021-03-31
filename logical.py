@@ -7,6 +7,7 @@ logical = m < 5
 indices = np.nonzero(logical)
 
 print(indices)
+print(np.transpose(indices))
 
 
 

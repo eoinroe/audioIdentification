@@ -80,65 +80,118 @@ def peak_picking_fpm(matrix, min_distance, threshold_rel):
     return grid
 
 
+def plot_constellation_map(coords):
+    """
+        Plot a constellation map based on the coordinates of the nonzero elements in
+        the logical array.  A scatter plot or pyplot's spy() function can be used.
+        The imshow() function produces a visualisation that is too small to be useful.
+
+        Parameters:
+            coords (np.ndarray):
+
+    """
+    plt.figure(figsize=(10, 5))
+    plt.imshow(coords, cmap=plt.get_cmap('gray_r'), origin='lower')
+
+    y, x = np.nonzero(coords)
+    plt.scatter(x, y, s=10, marker='.', c='black')
+
+    # Can use either spy() or a scatter()
+    # plt.spy(coordinates, marker='.', markersize=5, mfc='black', mec='black', origin='lower')
+
+    plt.show()
+
+
+def fingerprint_matching(query, database_recording):
+    rows, cols = np.indices(query.shape)
+
+    # Shifting the query by m positions yields the constellation map m + C(Q)
+    m_positions = database_recording.shape[1] - query.shape[1] + 1
+
+    # As long as the number of correctly matching
+    # peak coordinates is statistically significant
+    percentages = np.zeros(m_positions)
+
+    for m in range(m_positions):
+        result = query == database_recording[rows, cols + m]
+        percentages[m] = np.sum(result) / query.size
+
+    index_of_maximum = np.argmax(percentages)
+    match = database_recording[rows, cols + index_of_maximum]
+    print(np.amax(percentages))
+
+    # fig = plt.figure(figsize=(10, 5))
+    # ax = fig.add_subplot(111)
+    #
+    # y, x = np.nonzero(database_recording)
+    # ax.scatter(x, y, s=10, marker='.', c='black')
+    #
+    # y, x = np.nonzero(match)
+    # ax.scatter(x, y, s=1, marker='.', c='red')
+
+    plt.figure(figsize=(10, 5))
+
+    y, x = np.nonzero(database_recording)
+    plt.scatter(x, y, s=10, marker='.', c='black')
+
+    y, x = np.nonzero(match)
+    plt.scatter(x + index_of_maximum, y, s=1, marker='.', c='red')
+
+    plt.show()
+
+    # plot_constellation_map(match)
+    # plot_constellation_map(database_recording)
+
+
+def spectrogram(path):
+    y, sr = librosa.load(path)
+
+    # STFT returns a complex-valued matrix D so we need
+    # to take the absolute value of each element.
+    return np.abs(librosa.stft(y, n_fft=1024, window='hann', win_length=1024, hop_length=512))
+
+
 # Investigate different peak picking options for creating constellation maps,
 # and use the two lab recordings to plot the derived constellation maps.
 
-# Load the query recording
-snd, sr = librosa.load('data/jazz.00005-snippet-10-0.wav')
+spec = spectrogram('data/jazz.00005-snippet-10-0.wav')
+CQ = peak_local_max(np.log(spec), min_distance=10, threshold_rel=0.05, indices=False)
 
-# Detect peaks from STFT spectrogram and plot constellation maps
-D = np.abs(librosa.stft(snd, n_fft=1024, window='hann', win_length=1024, hop_length=512))
+print('CQ Dimensions: ', CQ.shape)
+plot_constellation_map(CQ)
 
-# Method from Skimage
-coordinates = peak_local_max(np.log(D), min_distance=10, threshold_rel=0.05, indices=False)
+p = 'data/jazz.00005.wav'
+CD = peak_local_max(np.log(spectrogram(p)), min_distance=10, threshold_rel=0.05, indices=False)
 
-plt.figure(figsize=(10, 5))
-plt.imshow(coordinates, cmap=plt.get_cmap('gray_r'), origin='lower')
+print('CD Dimensions: ', CD.shape)
+plot_constellation_map(CD)
 
-x, y = np.nonzero(coordinates)
+fingerprint_matching(CQ, CD)
 
-# Need to swap x and y for some reason...
-plt.scatter(y, x, s=1.5)
-
-plt.show()
-
-# Method using ndimage.maximum_filter()
+# # Method using ndimage.maximum_filter()
 # coordinates = peak_picking_max_filter(D, min_distance=10, threshold_rel=0.05)
-#
-# plt.figure(figsize=(10, 5))
-# plt.imshow(coordinates, cmap=plt.get_cmap('gray_r'), origin='lower')
-# plt.show()
+# plot_constellation_map(coordinates)
 #
 # # Implementation of technique described in Fundamentals of Music Processing
 # coordinates = peak_picking_fpm(D, min_distance=10, threshold_rel=0.05)
-#
-# plt.figure(figsize=(10, 5))
-# plt.imshow(coordinates, cmap=plt.get_cmap('gray_r'), origin='lower')
-# plt.show()
+# plot_constellation_map(coordinates)
 #
 # # Experiment with different time-frequency representations beyond the STFT,
 # # e.g. you can use the CQT spectrogram or mel spectrogram as alternatives.
 #
 # # Mel spectrogram and technique described in Fundamentals of Music Processing.
 # S = librosa.feature.melspectrogram(snd, sr=sr, n_fft=1024, window='hann', win_length=1024, hop_length=512)
-# coordinates = peak_picking_fpm(S, min_distance=10, threshold_rel=0.05)
 #
-# plt.figure(figsize=(10, 5))
-# plt.imshow(coordinates, cmap=plt.get_cmap('gray_r'), origin='lower')
-# plt.show()
+# coordinates = peak_picking_fpm(S, min_distance=10, threshold_rel=0.05)
+# plot_constellation_map(coordinates)
 #
 # # CQT and technique described in Fundamentals of Music Processing.
 # C = np.abs(librosa.cqt(snd, sr=sr, window='hann', hop_length=512))
-# coordinates = peak_picking_fpm(C, min_distance=10, threshold_rel=0.05)
 #
-# plt.figure(figsize=(10, 5))
-# plt.imshow(coordinates, cmap=plt.get_cmap('gray_r'), origin='lower')
-# plt.show()
+# coordinates = peak_picking_fpm(C, min_distance=10, threshold_rel=0.05)
+# plot_constellation_map(coordinates)
 
 # Explore different parameters for defining your peak picking neighbourhood.
 
 # What could these be?  I guess a neighborhood doesn't necessarily have to
 # be perfectly square...
-
-
-
